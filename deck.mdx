@@ -1,23 +1,125 @@
-import { Head } from 'mdx-deck'
+import { Head, Image, Appear, Notes } from "mdx-deck";
 
-export { default as theme } from './theme'
+export theme from "./theme";
 
 <Head>
-  <title>Presentation Title</title>
+  <title>Resolution</title>
 </Head>
 
-# Hello
+## Relationship Resolution
+
+### in React/Redux
+
+###### .
+
+#### Grant Glidewell
+
+#### Front End Engineer with Zesty.io
 
 ---
 
-## Edit this file
+## Manager UI
 
-To create your presentation
-
-```notes
-- Create speaker notes in fenced code blocks
-```
+<ul>
+  <Appear>
+    <li>See all the content associated with an instance</li>
+    <li>Edit content, including metadata and various fields</li>
+    <li>Publish content and iterate on versions</li>
+  </Appear>
+</ul>
 
 ---
 
-<https://github.com/jxnblk/mdx-deck>
+<Image src="mgrapp.png" size="cover" />
+<Notes>
+  We recently released our new content management ui. This was built in react and redux and relies heavily on a new golang rest api. This was a huge undertaking, as we were re-building our core product. Some issues we hit along the way were new problems, previously the app was a monolith, and now we were creating with an independent front and back end. This means we are now relying on calls to an api rather than directly hooking into a database. There are clear advantages with this approach, one being the code can be much cleaner as it’s purpose becomes more singular. I did, however, make some actions more difficult. One of those issues came in the form of relationships.
+
+</Notes>
+
+---
+
+#### .
+
+## The Problem
+
+<Image src="listview.png" size="80%" />
+<Notes>
+In Zesty users can create content with completely custom data models. This means in many cases they want to create relationships between content. say pages that relate to one another in a specific way, an author that has written an article, or labeling certain content with tags. On the surface this seems simple enough.
+</Notes>
+
+---
+
+#### .
+
+## The Problem
+
+<Image src="relationship.png" size="60%" />
+
+<Notes>
+ We get an article for a user to edit, if the article has relationships we fetch the associated piece of data. However relationships usually point to a certain field on a piece of content, which requires you to lookup a field, requiring the content’s model, to reference a specific value. So now we’re dealing with a whole process to resolve.
+</Notes>
+---
+
+#### .
+
+## The Problem
+
+<Image src="listview2.png" size="80%" />
+
+---
+
+## Solutions
+
+### App Layers
+
+<ul>
+  <Appear>
+    <li>Presentation Components</li>
+    <li>Container Components</li>
+    <li>Routing (HashRouter)</li>
+    <li>Redux Store</li>
+    <li>External Resources</li>
+  </Appear>
+</ul>
+
+---
+
+## Solutions
+
+### Component level resolution
+
+<ul>
+  <Appear>
+    <li>Container components know what is and is not in the store</li>
+    <li>The have the ability to dispatch actions</li>
+    <li style={{color:'orange'}}>HOWEVER...</li>
+    <li style={{color:'red'}}>They are UI, and should be decoupled from the store</li>
+    <li style={{color:'red'}}>This can lead to overly complex components</li>
+  </Appear>
+</ul>
+---
+
+#### .
+
+## Solutions
+
+<Image src="listview3.png" size="80%" />
+
+<Notes>
+  Here we see that the relationship column in this list view has multiple
+  relationships that resolve to the same content.
+</Notes>
+
+---
+
+## Relationship Resolution
+
+### in React/Redux
+
+###### .
+
+#### Grant Glidewell
+
+#### Front End Engineer with Zesty.io
+
+###### grant@grantglidewell.com
