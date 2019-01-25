@@ -3,10 +3,10 @@ import { Head, Image, Appear, Notes } from "mdx-deck";
 export theme from "./theme";
 
 <Head>
-  <title>Resolution</title>
+  <title>Relationships are hard</title>
 </Head>
 
-## Relationship Resolution
+## Relationships are hard
 
 ### in React/Redux
 
@@ -109,6 +109,68 @@ In Zesty users can create content with completely custom data models. This means
   Here we see that the relationship column in this list view has multiple
   relationships that resolve to the same content.
 </Notes>
+
+---
+
+## Solutions
+
+### Redux action/reducer
+
+<ul>
+  <Appear>
+    <li>Direct store access</li>
+    <li>Could be chained off of existing actions</li>
+    <li style={{color:'orange'}}>HOWEVER...</li>
+    <li style={{color:'red'}}>This reduces predictability of our actions</li>
+    <li style={{color:'red'}}>Could lead to impure reducers</li>
+  </Appear>
+</ul>
+---
+
+## Solutions
+
+### Middleware
+
+---
+
+## Middleware
+
+```javascript
+export const fetchResource = store => next => action => {
+  if (action.type === "FETCH_RESOURCE") {
+    if (`The request is not already in flight`) {
+      inflight.push(action.uri);
+      return request(action.uri);
+    }
+  }
+};
+```
+
+```notes
+Redux midleware requires some setup, but essentially we check here if the request is in flight. if not we go ahead and send the request off. if it's in the array we call next() to continue the redux action on.
+```
+
+---
+
+## Middleware
+
+```javascript
+export const resolveFieldOptions = store => next => action => {
+  if (action.type === "FETCH_FIELDS_SUCCESS") {
+    if (action.data) {
+      if(fields in data contains 'relationships'){
+        parseRelationships().then(relatedItem => {
+          dispatch({type: "FETCH_RESOURCE", uri: `uri.to.${relatedItem}`})
+        })
+      }
+    }
+  }
+}
+```
+
+```notes
+Now that we have requests de-duplicated, we have the chance to look at relationships at the first possible moment. Relationships are defined on the 'field', so if we look at what can be related, and fetch that data, we will have it when we need to render it.
+```
 
 ---
 
