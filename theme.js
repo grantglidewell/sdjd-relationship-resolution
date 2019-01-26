@@ -1,5 +1,5 @@
 import theme from "mdx-deck/themes";
-import okaidia from "react-syntax-highlighter/styles/prism/okaidia";
+import tomorrow from "react-syntax-highlighter/styles/prism/tomorrow";
 
 export default {
   ...theme,
@@ -10,6 +10,6 @@ export default {
     link: "#070809"
   },
   prism: {
-    style: okaidia
+    style: tomorrow
   }
 };

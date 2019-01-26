@@ -31,10 +31,10 @@ export theme from "./theme";
 ---
 
 <Image src="mgrapp.png" size="cover" />
-<Notes>
+```notes
   We recently released our new content management ui. This was built in react and redux and relies heavily on a new golang rest api. This was a huge undertaking, as we were re-building our core product. Some issues we hit along the way were new problems, previously the app was a monolith, and now we were creating with an independent front and back end. This means we are now relying on calls to an api rather than directly hooking into a database. There are clear advantages with this approach, one being the code can be much cleaner as it’s purpose becomes more singular. I did, however, make some actions more difficult. One of those issues came in the form of relationships.
 
-</Notes>
+````
 
 ---
 
@@ -43,9 +43,9 @@ export theme from "./theme";
 ## The Problem
 
 <Image src="listview.png" size="80%" />
-<Notes>
+```notes
 In Zesty users can create content with completely custom data models. This means in many cases they want to create relationships between content. say pages that relate to one another in a specific way, an author that has written an article, or labeling certain content with tags. On the surface this seems simple enough.
-</Notes>
+````
 
 ---
 
@@ -55,9 +55,10 @@ In Zesty users can create content with completely custom data models. This means
 
 <Image src="relationship.png" size="60%" />
 
-<Notes>
+```notes
  We get an article for a user to edit, if the article has relationships we fetch the associated piece of data. However relationships usually point to a certain field on a piece of content, which requires you to lookup a field, requiring the content’s model, to reference a specific value. So now we’re dealing with a whole process to resolve.
-</Notes>
+```
+
 ---
 
 #### .
@@ -105,10 +106,10 @@ In Zesty users can create content with completely custom data models. This means
 
 <Image src="listview3.png" size="80%" />
 
-<Notes>
+```notes
   Here we see that the relationship column in this list view has multiple
   relationships that resolve to the same content.
-</Notes>
+```
 
 ---
 
@@ -147,7 +148,7 @@ export const fetchResource = store => next => action => {
 ```
 
 ```notes
-Redux midleware requires some setup, but essentially we check here if the request is in flight. if not we go ahead and send the request off. if it's in the array we call next() to continue the redux action on.
+essentially we check here if the request is in flight. if not we go ahead and send the request off. if it's in the array we call next() to continue the redux action on.
 ```
 
 ---
@@ -158,7 +159,7 @@ Redux midleware requires some setup, but essentially we check here if the reques
 export const resolveFieldOptions = store => next => action => {
   if (action.type === "FETCH_FIELDS_SUCCESS") {
     if (action.data) {
-      if(fields in data contains 'relationships'){
+      if(field in data contains 'relationships'){
         parseRelationships().then(relatedItem => {
           dispatch({type: "FETCH_RESOURCE", uri: `uri.to.${relatedItem}`})
         })
@@ -169,8 +170,21 @@ export const resolveFieldOptions = store => next => action => {
 ```
 
 ```notes
-Now that we have requests de-duplicated, we have the chance to look at relationships at the first possible moment. Relationships are defined on the 'field', so if we look at what can be related, and fetch that data, we will have it when we need to render it.
+Now that we have resource requests de-duplicated, we have the chance to look at relationships at the first possible moment. Relationships are defined on the 'field', so if we look at what can be related, and fetch that data, we will have it when we need to render it.
 ```
+
+---
+
+## Middleware
+
+With this approach our other code could stand alone.
+with relationships handled independently, mental space is freed up to reason about other parts of the application.
+
+---
+
+## Middleware
+
+Our redux store stayed clean, components are unaware that this is happening under the hood, and users dont have their browsers full of redundant requests.
 
 ---
 
