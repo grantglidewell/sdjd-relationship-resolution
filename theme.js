@@ -1,12 +1,13 @@
 import theme from "mdx-deck/themes";
 import tomorrow from "react-syntax-highlighter/styles/prism/tomorrow";
-
+import Provider from "./Provider";
 export default {
   ...theme,
-  font: "sans-serif",
+  font: "Montserrat",
+  Provider,
   colors: {
-    text: "#090807",
-    background: "#efefef",
+    text: "#a7afbf",
+    background: "#1b202c",
     link: "#070809"
   },
   prism: {

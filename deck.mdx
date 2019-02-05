@@ -21,22 +21,34 @@ export theme from "./theme";
 <Image src="mgrapp.png" size="fill" />
 
 ```notes
-  We recently released our new content management ui. This was a huge undertaking, were re-building our core product. Previously the app was a PHP monolith, our new release is built in React/Redux and relies heavily on a new golang rest api. This means we are now relying on calls to an api rather than directly manipulating a database. There are clear advantages with this approach, one being the code can be much cleaner as it’s purpose becomes more singular. It did, however, make some actions more difficult. One of those issues came in the form of relationships. But before we get into the problem, what do users expect from our manager application?
+  We recently released our new content management ui. This was a huge undertaking, were re-building our core product. Previously the app was a PHP monolith, our new release is built in React/Redux and relies heavily on a new golang rest api. This means we are now relying on calls to an api rather than directly manipulating a database. There are clear advantages with this approach, one being the code can be much cleaner as it’s purpose becomes more singular. It did, however, make some actions more difficult. One of those issues came in the form of relationships.
 
 ```
 
 ---
 
-## Manager UI
+#### .
 
-<ul>
-  <Appear>
-    <li>See all the content associated with an instance</li>
-    <li>Edit content, including metadata and various fields</li>
-    <li>Publish content and iterate on versions</li>
-    <li>Content's data structure is dictated by the user</li>
-  </Appear>
-</ul>
+## What is a Relationship?
+
+<Image src="RelationshipBasic.png" size="50%" />
+
+```notes
+In any CMS users are going to want to create relationships.
+In general a relationship is simple, an ID on item (in this case an article), will point to another related piece of data (in this case an author for that article).
+```
+
+---
+
+#### .
+
+## What is a Relationship?
+
+<Image src="RelationshipZesty.png" size="50%" />
+
+```notes
+In Zesty's context relationships are a little bit more complex. What matters here are that we dont just have content items, we have fields attached to those content items which define what they are and how they behave in different contexts.
+```
 
 ---
 
@@ -47,7 +59,7 @@ export theme from "./theme";
 <Image src="listview.png" size="80%" />
 
 ```notes
-In Zesty users can create content with completely custom data models. This means in many cases they want to create relationships between content. say pages that relate to one another in a specific way, an author that has written an article, or labeling certain content with tags. On the surface this seems simple enough.
+In our list view here we see some articles. They have titles, images, dates, tags, and what we actually care about here is Authors.
 ```
 
 ---
@@ -59,19 +71,7 @@ In Zesty users can create content with completely custom data models. This means
 <Image src="listview2.png" size="80%" />
 
 ```notes
-In this case we are dealing with authors associated with the articles they have written
-```
-
----
-
-#### .
-
-## The Problem
-
-<Image src="relationship.png" size="60%" />
-
-```notes
- We get an article for a user to edit, if the article has relationships we need to get the associated piece of data. However relationships usually point to a certain field on a piece of content, which requires you to lookup a field, requiring the content’s model, to reference a specific value. So now we’re dealing with a whole process to resolve the relationship.
+In order to resolve these authors to the names you se here, we have to look up the item in our store, and then look up the correct field on that item. So the data we are dealing with could be incomplete in our store in two places. We may need to get fields, or the related author. Either one of these pieces missing will result in the UI not being able to display the author.
 ```
 
 ---
@@ -102,13 +102,8 @@ In trying to find a solution to this, we had to make some decisons on where the 
 
 <ul>
   <Appear>
-    <li>Container components know what is and is not in the store</li>
-    <li>They have the ability to dispatch actions</li>
-    <li style={{ color: "orange" }}>HOWEVER...</li>
-    <li style={{ color: "red" }}>
-      They are UI, and should be decoupled from this kind of logic
-    </li>
-    <li style={{ color: "red" }}>This can lead to overly complex components</li>
+    <li>They are UI, and should be decoupled from this kind of logic</li>
+    <li>This can lead to overly complex components</li>
   </Appear>
 </ul>
 
@@ -136,12 +131,8 @@ Resolving relationships in a container component is possible as they have access
 
 <ul>
   <Appear>
-    <li>Direct store access</li>
-    <li>Could be chained off of existing actions</li>
-    <li style={{ color: "orange" }}>HOWEVER...</li>
-    <li style={{ color: "red" }}>This reduces predictability of our actions</li>
-    <li style={{ color: "red" }} />
-    <li style={{ color: "red" }}>There is a place for this!</li>
+    <li>This reduces predictability of our actions</li>
+    <li>Redux provides a solution for these situations</li>
   </Appear>
 </ul>
 
@@ -190,15 +181,13 @@ essentially we check here if the request is in flight. if not we go ahead and se
 ```javascript
 export const resolveFieldOptions = store => next => action => {
   if (action.type === "FETCH_FIELDS_SUCCESS") {
-    if (action.data) {
-      if(field in data contains 'relationships'){
-        parseRelationships().then(relatedItem => {
-          dispatch({type: "FETCH_RESOURCE", uri: `uri.to.${relatedItem}`})
-        })
-      }
+    if (`field contains relationships`) {
+      parseRelationships().then(relatedItem => {
+        dispatch({ type: "FETCH_RESOURCE", uri: `uri.to.${relatedItem}` });
+      });
     }
   }
-}
+};
 ```
 
 ```notes
